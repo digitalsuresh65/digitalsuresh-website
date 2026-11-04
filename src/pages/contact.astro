@@ -69,6 +69,7 @@ const formConfigured = Boolean(siteConfig.formEndpoint);
         >
           <input type="hidden" name="_subject" value="New Digital Suresh website inquiry" />
           <input type="hidden" name="_template" value="table" />
+          <input type="hidden" name="_url" value="" />
           <input type="text" name="_honey" tabindex="-1" autocomplete="off" class="form-honeypot" aria-hidden="true" />
           <div class="form-row">
             <div class="field">
@@ -114,6 +115,45 @@ const formConfigured = Boolean(siteConfig.formEndpoint);
   const form = document.querySelector<HTMLFormElement>("[data-contact-form]");
   const status = form?.querySelector<HTMLElement>("[data-form-status]");
   const submitButton = form?.querySelector<HTMLButtonElement>("button[type='submit']");
+  const sourceUrl = form?.querySelector<HTMLInputElement>("input[name='_url']");
+
+  if (sourceUrl) sourceUrl.value = window.location.href;
+
+  const showStatus = (state: "error" | "setup" | "success", message: string) => {
+    if (!status) return;
+    status.hidden = false;
+    status.dataset.state = state;
+    status.textContent = message;
+  };
+
+  const showEmailFallback = (message: string) => {
+    if (!form || !status) return;
+
+    const data = new FormData(form);
+    const name = String(data.get("name") || "").trim();
+    const senderEmail = String(data.get("email") || "").trim();
+    const business = String(data.get("business") || "").trim();
+    const website = String(data.get("website") || "").trim();
+    const inquiry = String(data.get("message") || "").trim();
+    const email = form.dataset.email || "";
+    const body = [
+      `Name: ${name}`,
+      `Email: ${senderEmail}`,
+      `Business: ${business}`,
+      website ? `Website: ${website}` : "",
+      "",
+      inquiry,
+    ].filter((line, index, lines) => line || lines[index - 1] !== "").join("\n");
+    const href = `mailto:${email}?subject=${encodeURIComponent("Website inquiry")}&body=${encodeURIComponent(body)}`;
+    const link = document.createElement("a");
+    link.href = href;
+    link.textContent = "Open a prefilled email instead";
+
+    status.hidden = false;
+    status.dataset.state = "error";
+    status.replaceChildren(document.createTextNode(`${message} `), link, document.createTextNode("."));
+    status.focus();
+  };
 
   const setError = (field: HTMLInputElement | HTMLTextAreaElement, message: string) => {
     const error = form?.querySelector<HTMLElement>(`[data-error-for="${field.name}"]`);
@@ -156,22 +196,13 @@ const formConfigured = Boolean(siteConfig.formEndpoint);
     if (!valid) {
       const firstInvalid = fields.find((field) => field.getAttribute("aria-invalid") === "true");
       firstInvalid?.focus();
-      if (status) {
-        status.hidden = false;
-        status.dataset.state = "error";
-        status.textContent = "Please correct the highlighted fields and try again.";
-      }
+      showStatus("error", "Please correct the highlighted fields and try again.");
       return;
     }
 
     const endpoint = form.dataset.endpoint?.trim();
-    const email = form.dataset.email;
     if (!endpoint) {
-      if (status) {
-        status.hidden = false;
-        status.dataset.state = "setup";
-        status.innerHTML = `Online submission is not configured yet. Please email <a href="mailto:${email}">${email}</a>.`;
-      }
+      showEmailFallback("Online submission is not configured yet.");
       return;
     }
 
@@ -181,33 +212,36 @@ const formConfigured = Boolean(siteConfig.formEndpoint);
     }
     if (status) status.hidden = true;
 
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 12000);
+
     try {
       const payload = Object.fromEntries(new FormData(form).entries());
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(payload),
+        signal: controller.signal,
       });
       const result = await response.json().catch(() => null);
       if (!response.ok || result?.success === false || result?.success === "false") {
-        throw new Error(`Submission failed with status ${response.status}`);
+        const reason = String(result?.message || "");
+        if (reason.toLowerCase().includes("activat")) throw new Error("activation-required");
+        throw new Error(`submission-failed-${response.status}`);
       }
 
       form.reset();
+      if (sourceUrl) sourceUrl.value = window.location.href;
       fields.forEach((field) => setError(field, ""));
-      if (status) {
-        status.hidden = false;
-        status.dataset.state = "success";
-        status.textContent = "Thanks—your inquiry was sent successfully. I’ll respond using the email address you provided.";
-        status.focus();
-      }
+      showStatus("success", "Thanks—your inquiry was sent successfully. I’ll respond using the email address you provided.");
+      status?.focus();
     } catch (error) {
-      if (status) {
-        status.hidden = false;
-        status.dataset.state = "error";
-        status.innerHTML = `Your inquiry could not be sent. Please try again or email <a href="mailto:${email}">${email}</a>.`;
-      }
+      const message = error instanceof Error && error.message === "activation-required"
+        ? "The online form is awaiting activation."
+        : "The online form service is temporarily unavailable. Your details have not been lost.";
+      showEmailFallback(message);
     } finally {
+      window.clearTimeout(timeout);
       if (submitButton) {
         submitButton.disabled = false;
         submitButton.textContent = "Send inquiry";
