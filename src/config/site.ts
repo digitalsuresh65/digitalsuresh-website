@@ -9,9 +9,7 @@ export const siteConfig = {
   // Setup placeholder: add the complete scheduling URL before launch.
   bookingUrl: "",
   siteUrl: import.meta.env.PUBLIC_SITE_URL?.trim() || "http://localhost:4321",
-  formEndpoint:
-    import.meta.env.PUBLIC_FORM_ENDPOINT?.trim() ||
-    `https://formsubmit.co/ajax/${contactEmail}`,
+  formEndpoint: `https://formsubmit.co/ajax/${contactEmail}`,
   formAction: `https://formsubmit.co/${contactEmail}`,
   consultationCta: "Book a Free Consultation Call",
   consultationOffer:

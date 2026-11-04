@@ -43,6 +43,9 @@ const fullTitle = `${title} | ${siteConfig.brandName}`;
     <title>{fullTitle}</title>
   </head>
   <body>
+    <div class="scroll-progress" aria-hidden="true" data-scroll-progress>
+      <span></span>
+    </div>
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <Header currentPath={Astro.url.pathname} />
     <main id="main-content">
@@ -51,6 +54,93 @@ const fullTitle = `${title} | ${siteConfig.brandName}`;
     <Footer />
     <script>
       document.documentElement.classList.add("js");
+
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const progress = document.querySelector<HTMLElement>("[data-scroll-progress]");
+      const header = document.querySelector<HTMLElement>("[data-header]");
+
+      const revealGroups = [
+        ".section-heading",
+        ".challenge-card",
+        ".approach-copy",
+        ".approach-step",
+        ".service-card",
+        ".reason-card",
+        ".process-list li",
+        ".portrait-visual",
+        ".about-preview-card",
+        ".article-card",
+        ".faq-list details",
+        ".consultation-panel",
+        ".page-hero-inner",
+        ".about-copy",
+        ".principle-card",
+        ".service-detail",
+        ".featured-article",
+        ".booking-panel",
+        ".contact-form-panel",
+      ];
+
+      const revealItems = Array.from(
+        document.querySelectorAll<HTMLElement>(revealGroups.join(",")),
+      );
+
+      revealItems.forEach((item) => {
+        item.dataset.reveal = "";
+        const siblings = Array.from(item.parentElement?.children ?? []).filter(
+          (sibling) => sibling instanceof HTMLElement && revealGroups.some((selector) => sibling.matches(selector)),
+        );
+        const index = siblings.indexOf(item);
+        item.style.setProperty("--reveal-delay", `${Math.min(Math.max(index, 0), 5) * 70}ms`);
+      });
+
+      if (reducedMotion.matches || !("IntersectionObserver" in window)) {
+        revealItems.forEach((item) => {
+          delete item.dataset.reveal;
+          item.style.removeProperty("--reveal-delay");
+        });
+      } else {
+        const revealObserver = new IntersectionObserver(
+          (entries, observer) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              const item = entry.target as HTMLElement;
+              const finishReveal = (event: TransitionEvent) => {
+                if (event.propertyName !== "transform") return;
+                delete item.dataset.reveal;
+                item.classList.remove("is-visible");
+                item.style.removeProperty("--reveal-delay");
+                item.removeEventListener("transitionend", finishReveal);
+              };
+              item.addEventListener("transitionend", finishReveal);
+              item.classList.add("is-visible");
+              observer.unobserve(entry.target);
+            });
+          },
+          { rootMargin: "0px 0px -8%", threshold: 0.12 },
+        );
+        revealItems.forEach((item) => revealObserver.observe(item));
+      }
+
+      let scrollTicking = false;
+      const updateScrollUI = () => {
+        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+        const ratio = scrollable > 0 ? Math.min(window.scrollY / scrollable, 1) : 0;
+        progress?.style.setProperty("--scroll-progress", String(ratio));
+        progress?.style.setProperty("--scroll-progress-position", `${ratio * 100}%`);
+        header?.classList.toggle("is-scrolled", window.scrollY > 16);
+        scrollTicking = false;
+      };
+
+      const queueScrollUpdate = () => {
+        if (scrollTicking) return;
+        scrollTicking = true;
+        window.requestAnimationFrame(updateScrollUI);
+      };
+
+      updateScrollUI();
+      window.addEventListener("scroll", queueScrollUpdate, { passive: true });
+      window.addEventListener("resize", queueScrollUpdate, { passive: true });
     </script>
   </body>
 </html>

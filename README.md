@@ -37,7 +37,6 @@ Draft articles live in `src/content/blog/` as Markdown. Review and revise each a
 
 Copy `.env.example` to `.env` and set:
 
-- `PUBLIC_SITE_URL` to the final canonical HTTPS domain;
-- `PUBLIC_FORM_ENDPOINT` only if you want to override the built-in FormSubmit endpoint.
+- `PUBLIC_SITE_URL` to the final canonical HTTPS domain.
 
-The contact form sends inquiries through FormSubmit to `digitalsuresh65@gmail.com` and only shows success after FormSubmit returns a successful response. The first submission triggers a FormSubmit activation email; the recipient must click the confirmation link before inquiry emails are delivered. Keep private API keys on a server; never expose them through `PUBLIC_` environment variables.
+The contact form always sends inquiries through FormSubmit to `digitalsuresh65@gmail.com` and only shows success after FormSubmit returns a successful response. The first submission triggers a FormSubmit activation email; the recipient must click the confirmation link before inquiry emails are delivered.

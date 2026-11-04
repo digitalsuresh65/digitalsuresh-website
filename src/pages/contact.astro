@@ -4,7 +4,6 @@ import BookingLink from "@/components/BookingLink.astro";
 import { siteConfig } from "@/config/site";
 
 const bookingConfigured = Boolean(siteConfig.bookingUrl);
-const formConfigured = Boolean(siteConfig.formEndpoint);
 ---
 
 <BaseLayout
@@ -50,14 +49,11 @@ const formConfigured = Boolean(siteConfig.formEndpoint);
       </div>
 
       <div class="contact-form-panel">
-        <p class="eyebrow">Send an inquiry</p>
-        <h2>Have a question first?</h2>
-        <p>Fields marked with * are required.</p>
-        {!formConfigured && (
-          <p class="setup-notice" role="note">
-            The form is in setup mode and will not send or store data. Configure <code>PUBLIC_FORM_ENDPOINT</code> before launch, or email me directly.
-          </p>
-        )}
+        <div data-form-intro>
+          <p class="eyebrow">Send an inquiry</p>
+          <h2>Have a question first?</h2>
+          <p>Fields marked with * are required. Phone and website are optional.</p>
+        </div>
         <form
           class="contact-form"
           novalidate
@@ -90,10 +86,15 @@ const formConfigured = Boolean(siteConfig.formEndpoint);
               <p class="field-error" id="business-error" data-error-for="business"></p>
             </div>
             <div class="field">
-              <label for="website">Website <span class="sr-only">(optional)</span></label>
+              <label for="phone">WhatsApp / phone <span class="optional-label">(optional)</span></label>
+              <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+977 98XXXXXXXX" aria-describedby="phone-help" />
+              <p class="field-help" id="phone-help">Add the best number to reach you, including the country code.</p>
+            </div>
+          </div>
+          <div class="field">
+              <label for="website">Website <span class="optional-label">(optional)</span></label>
               <input id="website" name="website" type="url" inputmode="url" autocomplete="url" placeholder="https://" aria-describedby="website-error" />
               <p class="field-error" id="website-error" data-error-for="website"></p>
-            </div>
           </div>
           <div class="field">
             <label for="message">How can I help? *</label>
@@ -106,6 +107,13 @@ const formConfigured = Boolean(siteConfig.formEndpoint);
           <button class="button button-primary button-large" type="submit">Send inquiry</button>
           <p class="form-status" role="status" aria-live="polite" tabindex="-1" data-form-status hidden></p>
         </form>
+        <div class="form-success-panel" role="status" aria-live="polite" tabindex="-1" data-form-success hidden>
+          <span class="success-mark" aria-hidden="true">✓</span>
+          <p class="eyebrow">Message received</p>
+          <h2>Thank you for getting in touch!</h2>
+          <p>Your inquiry was sent successfully. I’ll review your message and respond using the email address you provided.</p>
+          <a class="button button-secondary" href="/">Return to the homepage</a>
+        </div>
       </div>
     </div>
   </section>
@@ -116,6 +124,8 @@ const formConfigured = Boolean(siteConfig.formEndpoint);
   const status = form?.querySelector<HTMLElement>("[data-form-status]");
   const submitButton = form?.querySelector<HTMLButtonElement>("button[type='submit']");
   const sourceUrl = form?.querySelector<HTMLInputElement>("input[name='_url']");
+  const formIntro = document.querySelector<HTMLElement>("[data-form-intro]");
+  const successPanel = document.querySelector<HTMLElement>("[data-form-success]");
 
   if (sourceUrl) sourceUrl.value = window.location.href;
 
@@ -133,6 +143,7 @@ const formConfigured = Boolean(siteConfig.formEndpoint);
     const name = String(data.get("name") || "").trim();
     const senderEmail = String(data.get("email") || "").trim();
     const business = String(data.get("business") || "").trim();
+    const phone = String(data.get("phone") || "").trim();
     const website = String(data.get("website") || "").trim();
     const inquiry = String(data.get("message") || "").trim();
     const email = form.dataset.email || "";
@@ -140,6 +151,7 @@ const formConfigured = Boolean(siteConfig.formEndpoint);
       `Name: ${name}`,
       `Email: ${senderEmail}`,
       `Business: ${business}`,
+      phone ? `WhatsApp / phone: ${phone}` : "",
       website ? `Website: ${website}` : "",
       "",
       inquiry,
@@ -233,8 +245,12 @@ const formConfigured = Boolean(siteConfig.formEndpoint);
       form.reset();
       if (sourceUrl) sourceUrl.value = window.location.href;
       fields.forEach((field) => setError(field, ""));
-      showStatus("success", "Thanks—your inquiry was sent successfully. I’ll respond using the email address you provided.");
-      status?.focus();
+      form.hidden = true;
+      if (formIntro) formIntro.hidden = true;
+      if (successPanel) {
+        successPanel.hidden = false;
+        successPanel.focus();
+      }
     } catch (error) {
       const message = error instanceof Error && error.message === "activation-required"
         ? "The online form is awaiting activation."
