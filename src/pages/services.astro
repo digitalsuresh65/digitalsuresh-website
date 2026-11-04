@@ -1,0 +1,62 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import BookingLink from "@/components/BookingLink.astro";
+import ConsultationSection from "@/components/ConsultationSection.astro";
+import { siteConfig } from "@/config/site";
+---
+
+<BaseLayout
+  title="AI and Digital Marketing Services"
+  description="Explore customizable AI-powered digital marketing services for strategy, lead generation, SEO, social media, advertising, email, automation, and workflows."
+>
+  <section class="page-hero">
+    <div class="container page-hero-inner">
+      <p class="eyebrow">Services</p>
+      <h1>Choose the marketing support your business needs now.</h1>
+      <p>
+        Every service is tailored to your goals, audience, current marketing, and resources.
+      </p>
+      <div class="hero-actions"><BookingLink class="button button-primary button-large" /></div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container service-detail-list">
+      {siteConfig.services.map((service, index) => (
+        <article class="service-detail" id={service.id}>
+          <div>
+            <span class="service-detail-number">0{index + 1}</span>
+            <h2>{service.title}</h2>
+            <p class="service-detail-summary">{service.summary}</p>
+          </div>
+          <div>
+            <div class="service-detail-columns">
+              <div>
+                <h3>Problems this can solve</h3>
+                <ul class="check-list">{service.challenges.map((item) => <li>{item}</li>)}</ul>
+              </div>
+              <div>
+                <h3>What the work may include</h3>
+                <ul class="check-list">{service.includes.map((item) => <li>{item}</li>)}</ul>
+              </div>
+            </div>
+            <div class="service-benefit"><strong>How it can help</strong>{service.benefits}</div>
+            <div class="service-detail-actions"><BookingLink class="text-link" /></div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="narrow-container">
+      <p class="eyebrow">Not sure where to start?</p>
+      <h2>Start with your goal. Choose only the work you need.</h2>
+      <p class="section-intro">
+        Your free consultation will help identify what matters now, what can wait, and which services fit your business.
+      </p>
+    </div>
+  </section>
+
+  <ConsultationSection title="Let’s find the right marketing priorities for your business." />
+</BaseLayout>

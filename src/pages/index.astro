@@ -1,0 +1,220 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import BookingLink from "@/components/BookingLink.astro";
+import ConsultationSection from "@/components/ConsultationSection.astro";
+import HeroVisual from "@/components/HeroVisual.astro";
+import PortraitPlaceholder from "@/components/PortraitPlaceholder.astro";
+import SectionHeading from "@/components/SectionHeading.astro";
+import { siteConfig } from "@/config/site";
+
+const articles = (await getCollection("blog")).slice(0, 3);
+const featuredServices = siteConfig.services.slice(0, 6);
+
+const challenges = [
+  ["Not enough leads", "Your lead flow changes from month to month."],
+  ["Hard to find online", "The right customers are not finding your business."],
+  ["No clear plan", "You are trying different tactics without knowing what to prioritize."],
+  ["Not enough time", "Content, follow-up, and reporting take too much time."],
+  ["Too many AI tools", "You are unsure which tools are useful or how to use them."],
+];
+
+const reasons = [
+  ["Built for your business", "Your plan is based on your audience, goals, resources, and current marketing."],
+  ["Practical next steps", "You get useful actions your business can start and manage."],
+  ["Plain-language guidance", "Every recommendation is explained clearly, without unnecessary jargon."],
+  ["Focused on business goals", "Marketing decisions stay connected to customers, leads, sales, and growth."],
+];
+---
+
+<BaseLayout
+  title="AI-Powered Digital Marketing for Growing Businesses"
+  description="Digital Suresh helps small and medium businesses use practical AI tools and digital marketing strategies to attract customers, generate qualified leads, and grow online."
+>
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">More visibility. Better leads. Smarter marketing.</p>
+        <h1>Get more customers with <em>AI-powered</em> marketing.</h1>
+        <p class="hero-lede">
+          I help small and medium businesses improve online visibility, generate qualified
+          leads, and turn more interest into sales with practical AI tools and a clear plan.
+        </p>
+        <div class="hero-actions">
+          <BookingLink class="button button-primary button-large" />
+          <a class="button button-secondary button-large" href="/services/">Explore My Services</a>
+        </div>
+        <p class="hero-note">{siteConfig.consultationOffer}</p>
+      </div>
+      <HeroVisual />
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <SectionHeading
+        eyebrow="Does this sound familiar?"
+        title="Your marketing should bring customers—not more confusion."
+        intro="You do not need more random tactics. You need a clear plan that fits your business."
+      />
+      <div class="challenge-grid">
+        {challenges.map(([title, copy], index) => (
+          <article class="challenge-card">
+            <span class="challenge-number">0{index + 1}</span>
+            <h3>{title}</h3>
+            <p>{copy}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container approach-grid">
+      <div class="approach-copy">
+        <p class="eyebrow">How I help</p>
+        <h2>A practical marketing plan powered by the right AI tools.</h2>
+        <p>
+          I look at your business, audience, offer, and current marketing. Then I help you
+          focus on the channels and actions that matter most.
+        </p>
+        <p>
+          AI can make research, content, follow-up, and reporting faster. A clear strategy
+          keeps that work focused on attracting customers and generating qualified leads.
+        </p>
+        <a class="text-link" href="/about/">Learn about my approach</a>
+      </div>
+      <div class="approach-map" aria-label="Three parts of the marketing approach">
+        <div class="approach-step">
+          <span>01</span>
+          <div><strong>Attract</strong><p>Reach the right people through search, content, social media, and ads.</p></div>
+        </div>
+        <div class="approach-step">
+          <span>02</span>
+          <div><strong>Engage</strong><p>Show potential customers how your business can help them.</p></div>
+        </div>
+        <div class="approach-step">
+          <span>03</span>
+          <div><strong>Convert</strong><p>Make it easy for interested visitors to become qualified leads.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <SectionHeading
+        eyebrow="Services"
+        title="Get the right marketing support at the right time."
+        intro="Start with one service or combine several into a plan built around your goals."
+      />
+      <div class="service-grid">
+        {featuredServices.map((service, index) => (
+          <article class="service-card">
+            <span class="service-card-index">0{index + 1}</span>
+            <h3>{service.title}</h3>
+            <p>{service.summary}</p>
+            <a class="text-link" href={`/services/#${service.id}`}>View service</a>
+          </article>
+        ))}
+      </div>
+      <div class="hero-actions">
+        <a class="button button-secondary" href="/services/">View all services</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <SectionHeading
+        eyebrow="Why work with me"
+        title="Clear advice. Practical action. No unnecessary complexity."
+        intro="You get focused recommendations that are easy to understand and use."
+      />
+      <div class="reason-grid">
+        {reasons.map(([title, copy]) => (
+          <article class="reason-card"><h3>{title}</h3><p>{copy}</p></article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="narrow-container">
+      <SectionHeading
+        eyebrow="A simple process"
+        title="Your path to a clear marketing plan."
+      />
+      <ol class="process-list">
+        <li><div><h3>Book your free consultation</h3><p>Share a few details about your business and current marketing.</p></div></li>
+        <li><div><h3>Discuss your goals</h3><p>We’ll talk about your audience, challenges, priorities, and opportunities.</p></div></li>
+        <li><div><h3>Get your customized plan</h3><p>Receive a Digital Marketing Plan you can start implementing immediately.</p></div></li>
+        <li><div><h3>Take action</h3><p>Use the plan yourself or discuss ongoing support if you need it.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container about-preview-grid">
+      <PortraitPlaceholder />
+      <div class="about-preview-card">
+        <p class="eyebrow eyebrow-light">About Digital Suresh</p>
+        <h2>A practical partner for your next stage of growth.</h2>
+        <p>{siteConfig.about.short}</p>
+        <a class="text-link" href="/about/">More About Me</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <SectionHeading
+        eyebrow="Useful insights"
+        title="Simple marketing ideas for busy business owners."
+        intro="Draft guides with practical ideas you can review before publication."
+      />
+      <div class="article-grid">
+        {articles.map((article) => (
+          <article class="article-card">
+            <div class="article-meta"><span>{article.data.category}</span><span>{article.data.readingTime}</span></div>
+            <span class="draft-badge">Draft for review</span>
+            <h3>{article.data.title}</h3>
+            <p>{article.data.excerpt}</p>
+            <a class="text-link" href={`/blog/${article.id}/`}>Read draft article</a>
+          </article>
+        ))}
+      </div>
+      <div class="hero-actions"><a class="button button-secondary" href="/blog/">Explore all insights</a></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <SectionHeading eyebrow="Frequently asked questions" title="What to know before you book." align="center" />
+      <div class="faq-list">
+        <details>
+          <summary>Who are your services for?</summary>
+          <p>I help small and medium business owners who want more visibility, better leads, and a clear marketing plan.</p>
+        </details>
+        <details>
+          <summary>What happens during the free consultation?</summary>
+          <p>{siteConfig.consultationOffer} We’ll focus on your goals, audience, and current challenges.</p>
+        </details>
+        <details>
+          <summary>Do I need technical knowledge or experience with AI?</summary>
+          <p>No. Everything is explained in plain language and matched to your current tools and experience.</p>
+        </details>
+        <details>
+          <summary>How much do services cost, and how long do they take?</summary>
+          <p>Pricing and timelines depend on the agreed scope and the support your business needs. We can discuss both after the consultation.</p>
+        </details>
+        <details>
+          <summary>How do I get started?</summary>
+          <p>Book a free consultation and tell me a little about your business. If booking is not set up yet, contact me by email.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <ConsultationSection />
+</BaseLayout>

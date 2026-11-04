@@ -1,0 +1,80 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import BookingLink from "@/components/BookingLink.astro";
+import ConsultationSection from "@/components/ConsultationSection.astro";
+import PortraitPlaceholder from "@/components/PortraitPlaceholder.astro";
+import SectionHeading from "@/components/SectionHeading.astro";
+import { siteConfig } from "@/config/site";
+---
+
+<BaseLayout
+  title="About Me"
+  description="Meet Suresh Man Joshi, the AI Marketing Expert behind Digital Suresh, helping small and medium businesses use practical AI and digital marketing strategies."
+>
+  <section class="section">
+    <div class="container about-hero-grid">
+      <div class="about-copy">
+        <p class="eyebrow">About me</p>
+        <h1>Helping businesses use AI and digital marketing with confidence.</h1>
+        <p>
+          I’m {siteConfig.name}, an {siteConfig.role} and the person behind {siteConfig.brandName}.
+          I help small and medium businesses reach more customers and generate better leads online.
+        </p>
+        <p>
+          I start with your business goals, then build a clear plan using practical marketing strategies and useful AI tools.
+        </p>
+        <div class="hero-actions"><BookingLink class="button button-primary button-large" /></div>
+      </div>
+      <PortraitPlaceholder priority={true} />
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container approach-grid">
+      <div>
+        <SectionHeading
+          eyebrow="Who I help"
+          title="For owners who want better marketing without the confusion."
+        />
+        <p class="section-intro">
+          I work with businesses that want more visibility, consistent leads, simpler marketing, and practical ways to save time with AI.
+        </p>
+      </div>
+      <div class="approach-map">
+        <div class="approach-step"><span>01</span><div><strong>Find the priority</strong><p>Identify the biggest gap in your current marketing.</p></div></div>
+        <div class="approach-step"><span>02</span><div><strong>Build the plan</strong><p>Choose the channels, messages, and tools that fit your business.</p></div></div>
+        <div class="approach-step"><span>03</span><div><strong>Improve over time</strong><p>Track useful signals and adjust the plan as you learn.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <SectionHeading
+        eyebrow="My approach"
+        title="Use AI to save time. Use strategy to stay focused."
+        intro="I use AI where it can make research, content, follow-up, and reporting simpler—while keeping human judgment in every important decision."
+      />
+      <div class="principles-grid">
+        <article class="principle-card"><span>01</span><h3>Practical advice</h3><p>Recommendations fit your time, team, budget, and current tools.</p></article>
+        <article class="principle-card"><span>02</span><h3>Clear communication</h3><p>Every decision and next step is explained in plain language.</p></article>
+        <article class="principle-card"><span>03</span><h3>Useful goals</h3><p>The work stays connected to the business results you want to improve.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="narrow-container placeholder-panel">
+      <h2>Personal details to complete before launch</h2>
+      <p>These items are intentionally left as editable placeholders in <code>src/config/site.ts</code> because verified biographical details were not provided.</p>
+      <ul>
+        <li>{siteConfig.about.personalHistory}</li>
+        <li>{siteConfig.about.qualifications}</li>
+        <li>{siteConfig.about.yearsExperience}</li>
+        <li>{siteConfig.location}</li>
+      </ul>
+    </div>
+  </section>
+
+  <ConsultationSection title="Ready for a clearer way to market your business?" />
+</BaseLayout>

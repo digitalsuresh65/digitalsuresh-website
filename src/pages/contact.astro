@@ -1,0 +1,217 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import BookingLink from "@/components/BookingLink.astro";
+import { siteConfig } from "@/config/site";
+
+const bookingConfigured = Boolean(siteConfig.bookingUrl);
+const formConfigured = Boolean(siteConfig.formEndpoint);
+---
+
+<BaseLayout
+  title="Book a Free Consultation"
+  description="Book a free consultation with Digital Suresh to discuss your business, marketing goals, challenges, and a customized Digital Marketing Plan."
+>
+  <section class="page-hero">
+    <div class="container page-hero-inner">
+      <p class="eyebrow">Contact</p>
+      <h1>Let’s create a clear marketing plan for your business.</h1>
+      <p>{siteConfig.consultationOffer}</p>
+    </div>
+  </section>
+
+  <section class="section section-alt" id="booking">
+    <div class="container contact-grid">
+      <div class="booking-panel">
+        <p class="eyebrow">Free consultation</p>
+        <h2>Start with a free consultation.</h2>
+        <p>
+          Tell me about your goals and current challenges. I’ll help you identify the most useful next steps.
+        </p>
+        <BookingLink class="button button-primary button-large" direct={true} />
+        {!bookingConfigured && (
+          <p class="setup-notice" role="status">
+            Booking setup is required. Add the real scheduling URL to <code>bookingUrl</code> in <code>src/config/site.ts</code>. In the meantime, email <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>.
+          </p>
+        )}
+        <div class="prepare-list">
+          <h3>What to bring</h3>
+          <ul>
+            <li>Your website URL, if you have one</li>
+            <li>Your main business and marketing goals</li>
+            <li>Your current marketing challenges</li>
+            <li>The audience you most want to reach</li>
+          </ul>
+        </div>
+        <div class="contact-details">
+          <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
+          <span>{siteConfig.location}</span>
+          {siteConfig.socialLinks.map((social) => <a href={social.url} target="_blank" rel="noreferrer">{social.label}</a>)}
+        </div>
+      </div>
+
+      <div class="contact-form-panel">
+        <p class="eyebrow">Send an inquiry</p>
+        <h2>Have a question first?</h2>
+        <p>Fields marked with * are required.</p>
+        {!formConfigured && (
+          <p class="setup-notice" role="note">
+            The form is in setup mode and will not send or store data. Configure <code>PUBLIC_FORM_ENDPOINT</code> before launch, or email me directly.
+          </p>
+        )}
+        <form
+          class="contact-form"
+          novalidate
+          action={siteConfig.formAction}
+          method="POST"
+          data-contact-form
+          data-endpoint={siteConfig.formEndpoint}
+          data-email={siteConfig.email}
+        >
+          <input type="hidden" name="_subject" value="New Digital Suresh website inquiry" />
+          <input type="hidden" name="_template" value="table" />
+          <input type="text" name="_honey" tabindex="-1" autocomplete="off" class="form-honeypot" aria-hidden="true" />
+          <div class="form-row">
+            <div class="field">
+              <label for="name">Name *</label>
+              <input id="name" name="name" type="text" autocomplete="name" required aria-describedby="name-error" />
+              <p class="field-error" id="name-error" data-error-for="name"></p>
+            </div>
+            <div class="field">
+              <label for="email">Email *</label>
+              <input id="email" name="email" type="email" autocomplete="email" required aria-describedby="email-error" />
+              <p class="field-error" id="email-error" data-error-for="email"></p>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label for="business">Business name *</label>
+              <input id="business" name="business" type="text" autocomplete="organization" required aria-describedby="business-error" />
+              <p class="field-error" id="business-error" data-error-for="business"></p>
+            </div>
+            <div class="field">
+              <label for="website">Website <span class="sr-only">(optional)</span></label>
+              <input id="website" name="website" type="url" inputmode="url" autocomplete="url" placeholder="https://" aria-describedby="website-error" />
+              <p class="field-error" id="website-error" data-error-for="website"></p>
+            </div>
+          </div>
+          <div class="field">
+            <label for="message">How can I help? *</label>
+            <textarea id="message" name="message" required minlength="20" aria-describedby="message-error" placeholder="Share your goals and current marketing challenges."></textarea>
+            <p class="field-error" id="message-error" data-error-for="message"></p>
+          </div>
+          <p class="privacy-copy">
+            Your details are processed by FormSubmit solely to deliver your inquiry to me by email so I can respond.
+          </p>
+          <button class="button button-primary button-large" type="submit">Send inquiry</button>
+          <p class="form-status" role="status" aria-live="polite" tabindex="-1" data-form-status hidden></p>
+        </form>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>("[data-contact-form]");
+  const status = form?.querySelector<HTMLElement>("[data-form-status]");
+  const submitButton = form?.querySelector<HTMLButtonElement>("button[type='submit']");
+
+  const setError = (field: HTMLInputElement | HTMLTextAreaElement, message: string) => {
+    const error = form?.querySelector<HTMLElement>(`[data-error-for="${field.name}"]`);
+    field.setAttribute("aria-invalid", message ? "true" : "false");
+    if (error) error.textContent = message;
+  };
+
+  const validateField = (field: HTMLInputElement | HTMLTextAreaElement) => {
+    const value = field.value.trim();
+    let message = "";
+
+    if (field.required && !value) {
+      message = "This field is required.";
+    } else if (field.type === "email" && value && !field.validity.valid) {
+      message = "Enter a valid email address.";
+    } else if (field.type === "url" && value && !field.validity.valid) {
+      message = "Enter a complete URL, including https://";
+    } else if (field.name === "message" && value && value.length < 20) {
+      message = "Please add a little more detail (at least 20 characters).";
+    }
+
+    setError(field, message);
+    return !message;
+  };
+
+  form?.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>("input:not([type='hidden']):not([name='_honey']), textarea").forEach((field) => {
+    field.addEventListener("blur", () => validateField(field));
+    field.addEventListener("input", () => {
+      if (field.getAttribute("aria-invalid") === "true") validateField(field);
+    });
+  });
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const fields = Array.from(
+      form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>("input:not([type='hidden']):not([name='_honey']), textarea"),
+    );
+    const valid = fields.map(validateField).every(Boolean);
+
+    if (!valid) {
+      const firstInvalid = fields.find((field) => field.getAttribute("aria-invalid") === "true");
+      firstInvalid?.focus();
+      if (status) {
+        status.hidden = false;
+        status.dataset.state = "error";
+        status.textContent = "Please correct the highlighted fields and try again.";
+      }
+      return;
+    }
+
+    const endpoint = form.dataset.endpoint?.trim();
+    const email = form.dataset.email;
+    if (!endpoint) {
+      if (status) {
+        status.hidden = false;
+        status.dataset.state = "setup";
+        status.innerHTML = `Online submission is not configured yet. Please email <a href="mailto:${email}">${email}</a>.`;
+      }
+      return;
+    }
+
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = "Sending…";
+    }
+    if (status) status.hidden = true;
+
+    try {
+      const payload = Object.fromEntries(new FormData(form).entries());
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = await response.json().catch(() => null);
+      if (!response.ok || result?.success === false || result?.success === "false") {
+        throw new Error(`Submission failed with status ${response.status}`);
+      }
+
+      form.reset();
+      fields.forEach((field) => setError(field, ""));
+      if (status) {
+        status.hidden = false;
+        status.dataset.state = "success";
+        status.textContent = "Thanks—your inquiry was sent successfully. I’ll respond using the email address you provided.";
+        status.focus();
+      }
+    } catch (error) {
+      if (status) {
+        status.hidden = false;
+        status.dataset.state = "error";
+        status.innerHTML = `Your inquiry could not be sent. Please try again or email <a href="mailto:${email}">${email}</a>.`;
+      }
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = "Send inquiry";
+      }
+    }
+  });
+</script>

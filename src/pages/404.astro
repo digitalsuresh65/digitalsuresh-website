@@ -1,0 +1,17 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Page Not Found" description="The page you requested could not be found." noindex={true}>
+  <section class="not-found">
+    <div class="container">
+      <p class="eyebrow">404 error</p>
+      <h1>That page isn’t here.</h1>
+      <p>The link may be outdated, or the page may have moved. Return to the homepage or explore the services page.</p>
+      <div class="hero-actions">
+        <a class="button button-primary" href="/">Return home</a>
+        <a class="button button-secondary" href="/services/">Explore services</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

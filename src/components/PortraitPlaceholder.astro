@@ -1,0 +1,27 @@
+---
+import { Image } from "astro:assets";
+import { siteConfig } from "@/config/site";
+import portrait from "@/assets/suresh-man-joshi-professional-portrait.png";
+
+interface Props {
+  priority?: boolean;
+}
+
+const { priority = false } = Astro.props;
+---
+
+<figure class="portrait-visual portrait-photo">
+  <Image
+    src={portrait}
+    alt={`${siteConfig.name}, ${siteConfig.role}`}
+    width={800}
+    format="webp"
+    quality={86}
+    loading={priority ? "eager" : "lazy"}
+    fetchpriority={priority ? "high" : "auto"}
+  />
+  <figcaption class="portrait-label">
+    <span>{siteConfig.name}</span>
+    <small>{siteConfig.role}</small>
+  </figcaption>
+</figure>

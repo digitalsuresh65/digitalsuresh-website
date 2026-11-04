@@ -1,0 +1,29 @@
+---
+import { siteConfig } from "@/config/site";
+
+interface Props {
+  class?: string;
+  direct?: boolean;
+}
+
+const { class: className = "button button-primary", direct = false } = Astro.props;
+const hasBooking = Boolean(siteConfig.bookingUrl);
+const href = hasBooking ? siteConfig.bookingUrl : "/contact/#booking";
+---
+
+{
+  direct && !hasBooking ? (
+    <span class={`${className} is-disabled`} aria-disabled="true">
+      {siteConfig.consultationCta}
+    </span>
+  ) : (
+    <a
+      class={className}
+      href={href}
+      target={hasBooking ? "_blank" : undefined}
+      rel={hasBooking ? "noreferrer" : undefined}
+    >
+      {siteConfig.consultationCta}
+    </a>
+  )
+}

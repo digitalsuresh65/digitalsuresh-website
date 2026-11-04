@@ -1,0 +1,117 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import ConsultationSection from "@/components/ConsultationSection.astro";
+
+const articles = await getCollection("blog");
+const featured = articles.find((article) => article.data.featured) ?? articles[0];
+const categories = [...new Set(articles.map((article) => article.data.category))].sort();
+---
+
+<BaseLayout
+  title="Marketing Insights"
+  description="Draft practical guides on AI marketing, digital marketing planning, and lead generation for small and medium businesses."
+  noindex={true}
+>
+  <section class="page-hero">
+    <div class="container page-hero-inner">
+      <p class="eyebrow">Marketing insights</p>
+      <h1>Simple marketing ideas you can use.</h1>
+      <p>
+        Practical guides on AI, lead generation, and digital marketing. All articles are draft content for review before publication.
+      </p>
+    </div>
+  </section>
+
+  {featured && (
+    <section class="section-tight">
+      <div class="container featured-article">
+        <div class="featured-copy">
+          <div class="article-meta"><span>{featured.data.category}</span><span>{featured.data.readingTime}</span></div>
+          <span class="draft-badge">Featured draft</span>
+          <h2>{featured.data.title}</h2>
+          <p>{featured.data.excerpt}</p>
+          <a class="text-link" href={`/blog/${featured.id}/`}>Read draft article</a>
+        </div>
+        <div class="featured-visual" aria-hidden="true"><span>AI</span></div>
+      </div>
+    </section>
+  )}
+
+  <section class="section section-alt" data-blog-listing>
+    <div class="container">
+      <div class="blog-toolbar">
+        <div class="field">
+          <label for="article-search">Search articles</label>
+          <input id="article-search" type="search" placeholder="Search by title, topic, or keyword" autocomplete="off" data-search />
+        </div>
+        <div class="field">
+          <label for="category-filter">Filter by category</label>
+          <select id="category-filter" data-category>
+            <option value="all">All categories</option>
+            {categories.map((category) => <option value={category.toLowerCase()}>{category}</option>)}
+          </select>
+        </div>
+      </div>
+
+      <p class="results-summary" aria-live="polite" data-results-summary>
+        Showing {articles.length} draft {articles.length === 1 ? "article" : "articles"}
+      </p>
+
+      <div class="article-grid" data-article-grid>
+        {articles.map((article) => (
+          <article
+            class="article-card"
+            data-article
+            data-title={article.data.title.toLowerCase()}
+            data-excerpt={article.data.excerpt.toLowerCase()}
+            data-category={article.data.category.toLowerCase()}
+          >
+            <div class="article-meta"><span>{article.data.category}</span><span>{article.data.readingTime}</span></div>
+            <span class="draft-badge">Draft for review</span>
+            <h3>{article.data.title}</h3>
+            <p>{article.data.excerpt}</p>
+            <a class="text-link" href={`/blog/${article.id}/`}>Read draft article</a>
+          </article>
+        ))}
+      </div>
+
+      <div class="empty-state" data-empty-state hidden>
+        <h2>No articles match those filters.</h2>
+        <p>Try a different keyword or choose “All categories.”</p>
+      </div>
+    </div>
+  </section>
+
+  <ConsultationSection title="Need a plan—not just more marketing ideas?" />
+</BaseLayout>
+
+<script>
+  const listing = document.querySelector<HTMLElement>("[data-blog-listing]");
+  const search = listing?.querySelector<HTMLInputElement>("[data-search]");
+  const category = listing?.querySelector<HTMLSelectElement>("[data-category]");
+  const cards = Array.from(listing?.querySelectorAll<HTMLElement>("[data-article]") ?? []);
+  const summary = listing?.querySelector<HTMLElement>("[data-results-summary]");
+  const emptyState = listing?.querySelector<HTMLElement>("[data-empty-state]");
+
+  const updateResults = () => {
+    const query = search?.value.trim().toLowerCase() ?? "";
+    const selected = category?.value ?? "all";
+    let visible = 0;
+
+    cards.forEach((card) => {
+      const text = `${card.dataset.title ?? ""} ${card.dataset.excerpt ?? ""} ${card.dataset.category ?? ""}`;
+      const matchesSearch = !query || text.includes(query);
+      const matchesCategory = selected === "all" || card.dataset.category === selected;
+      const show = matchesSearch && matchesCategory;
+      card.hidden = !show;
+      if (show) visible += 1;
+    });
+
+    if (summary) summary.textContent = `Showing ${visible} draft ${visible === 1 ? "article" : "articles"}`;
+    if (emptyState) emptyState.hidden = visible !== 0;
+  };
+
+  search?.addEventListener("input", updateResults);
+  category?.addEventListener("change", updateResults);
+</script>

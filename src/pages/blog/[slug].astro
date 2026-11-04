@@ -1,0 +1,46 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import BookingLink from "@/components/BookingLink.astro";
+import ConsultationSection from "@/components/ConsultationSection.astro";
+
+export async function getStaticPaths() {
+  const articles = await getCollection("blog");
+  return articles.map((article) => ({ params: { slug: article.id }, props: { article } }));
+}
+
+const { article } = Astro.props;
+const { Content } = await render(article);
+---
+
+<BaseLayout
+  title={article.data.title}
+  description={article.data.seoDescription}
+  noindex={article.data.draft}
+  pageType="article"
+>
+  {article.data.draft && (
+    <div class="draft-notice" role="note">
+      Draft content for review before publication. Not indexed by search engines.
+    </div>
+  )}
+  <header class="article-header">
+    <div class="narrow-container">
+      <a class="text-link" href="/blog/">Back to all insights</a>
+      <h1>{article.data.title}</h1>
+      <p class="article-lede">{article.data.excerpt}</p>
+      <div class="article-meta"><span>{article.data.category}</span><span>{article.data.readingTime}</span><span>Draft for review</span></div>
+    </div>
+  </header>
+
+  <div class="container article-layout">
+    <article class="prose"><Content /></article>
+    <aside class="article-aside" aria-label="Consultation invitation">
+      <h2>Put these ideas to work</h2>
+      <p>Get a Digital Marketing Plan based on your goals and current challenges.</p>
+      <BookingLink class="button button-primary" />
+    </aside>
+  </div>
+
+  <ConsultationSection title="Turn useful ideas into a clear marketing plan." />
+</BaseLayout>

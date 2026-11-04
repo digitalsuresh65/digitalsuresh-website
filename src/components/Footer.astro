@@ -1,0 +1,50 @@
+---
+import { navigation, siteConfig } from "@/config/site";
+import brandLogo from "../../Teal_DS.png";
+---
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-intro">
+      <a class="brand brand-footer" href="/" aria-label={`${siteConfig.brandName} home`}>
+        <span class="brand-logo-frame brand-logo-frame-footer">
+          <img
+            src={brandLogo.src}
+            width={brandLogo.width}
+            height={brandLogo.height}
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
+        </span>
+      </a>
+      <p>
+        Clear AI and digital marketing support for small and medium businesses.
+      </p>
+    </div>
+
+    <div>
+      <h2 class="footer-heading">Explore</h2>
+      <ul class="footer-links">
+        {navigation.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="footer-heading">Contact</h2>
+      <ul class="footer-links">
+        <li><a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a></li>
+        <li><span>{siteConfig.location}</span></li>
+        {
+          siteConfig.socialLinks.map((social) => (
+            <li><a href={social.url} target="_blank" rel="noreferrer">{social.label}</a></li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <p>© {new Date().getFullYear()} {siteConfig.name}. All rights reserved.</p>
+    <p>No tracking cookies or third-party embeds are enabled.</p>
+  </div>
+</footer>
